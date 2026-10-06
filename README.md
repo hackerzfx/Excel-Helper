@@ -120,6 +120,3 @@ node verify-engine.js
 
 Issues and pull requests are welcome. Please run `node verify-engine.js` before submitting a PR.
 
-## 📄 License
-
-Add your license here (e.g. [MIT](https://choosealicense.com/licenses/mit/)).
