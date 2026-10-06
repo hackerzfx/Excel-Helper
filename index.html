@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Excel Helper — friendly tools for everyday Excel tasks</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23217346'/%3E%3Cpath d='M30 25h28a6 6 0 016 6v8H36a6 6 0 00-6 6v8h-6a6 6 0 01-6-6V31a6 6 0 016-6z' fill='white' opacity='0.9'/%3E%3Cpath d='M44 47h22a6 6 0 016 6v16a6 6 0 01-6 6H50v-8a6 6 0 00-6-6h-6V53a6 6 0 016-6z' fill='white' opacity='0.9'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">E</div>
+    <span>Excel Helper</span>
+    <span class="tag">no experience needed</span>
+  </div>
+  <div class="top-actions">
+    <button class="btn" id="btn-open" title="Open your own Excel file">📂 Open Excel File</button>
+    <button class="btn btn-ghost" id="btn-invoice">🧾 Practice Invoice</button>
+    <button class="btn btn-ghost" id="btn-ledger">📒 Practice Ledger</button>
+    <button class="btn btn-ghost" id="btn-theme" title="Toggle dark mode">🌙</button>
+    <button class="btn" id="btn-undo" disabled>↩️ Undo</button>
+    <button class="btn btn-primary" id="btn-download" disabled>⬇️ Download Result</button>
+  </div>
+</header>
+
+<input type="file" id="file-input" accept=".xlsx" hidden>
+
+<div id="banner" class="banner hidden" role="status" aria-live="polite">
+  <span id="banner-text"></span>
+  <button id="banner-close" class="banner-close" title="Dismiss">×</button>
+</div>
+
+<main class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="basics" role="tab" aria-selected="true">1 · Basics</button>
+      <button class="tab" data-tab="formulas" role="tab" aria-selected="false">2 · Formulas</button>
+      <button class="tab" data-tab="accounts" role="tab" aria-selected="false">3 · Accounts</button>
+      <button class="tab" data-tab="sort" role="tab" aria-selected="false">4 · Sort &amp; Filter</button>
+    </nav>
+
+    <!-- ==================== TAB 1 · BASICS ==================== -->
+    <section class="tabpage active" id="tab-basics" role="tabpanel">
+      <div class="card accent">
+        <h3>Make the header row</h3>
+        <p class="hint">Bold white text on a colored background, centered and frozen so it stays visible while you scroll.</p>
+        <div class="row">
+          <label class="inline">Color <input type="color" id="hdr-color" value="#217346"></label>
+          <button class="btn btn-primary" id="btn-make-header">Style row 1</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Add borders</h3>
+        <p class="hint">Thin borders around every cell. Leave empty for the whole table, or type a range like <b>A1:E20</b>.</p>
+        <div class="row">
+          <input type="text" id="borders-range" placeholder="whole table, or e.g. A1:E20" aria-label="Range for borders">
+          <button class="btn" id="btn-borders">Add borders</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Number format</h3>
+        <p class="hint">Show numbers as money, with thousands commas, as percent, or as dates.</p>
+        <div class="row wrap">
+          <select id="nf-col" class="colsel" aria-label="Column"></select>
+          <select id="nf-type" aria-label="Number format">
+            <option value="currency">Currency</option>
+            <option value="comma">1,234.56</option>
+            <option value="percent">Percent %</option>
+            <option value="date">Date</option>
+          </select>
+          <select id="nf-symbol" aria-label="Currency symbol">
+            <option value="₹">₹ Rupee</option>
+            <option value="$">$ Dollar</option>
+            <option value="€">€ Euro</option>
+            <option value="£">£ Pound</option>
+          </select>
+          <button class="btn btn-primary" id="btn-nf">Apply</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Align a column</h3>
+        <div class="row wrap">
+          <select id="al-col" class="colsel" aria-label="Column to align"></select>
+          <button class="btn" id="btn-align-left">Left</button>
+          <button class="btn" id="btn-align-center">Center</button>
+          <button class="btn" id="btn-align-right">Right</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Auto-fit column widths</h3>
+        <p class="hint">Widens every column so nothing is cut off.</p>
+        <div class="row">
+          <button class="btn" id="btn-autofit">Auto-fit all columns</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Style a column</h3>
+        <p class="hint">Make a whole column bold and/or colored so it stands out.</p>
+        <div class="row wrap">
+          <select id="st-col" class="colsel" aria-label="Column to style"></select>
+          <label class="inline"><input type="checkbox" id="st-bold"> Bold</label>
+          <input type="color" id="st-color" value="#b91c1c" title="Text color">
+          <button class="btn btn-primary" id="btn-style-col">Apply</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2 · FORMULAS ==================== -->
+    <section class="tabpage" id="tab-formulas" role="tabpanel" hidden>
+      <div class="card accent">
+        <h3>QTY × RATE</h3>
+        <p class="hint">Adds a new column where each row multiplies two other columns, using real Excel formulas like <b>=B2*C2</b>.</p>
+        <div class="row wrap">
+          <label class="inline">Qty <select id="mu-a" class="colsel" aria-label="Qty column"></select></label>
+          <span class="x">×</span>
+          <label class="inline">Rate <select id="mu-b" class="colsel" aria-label="Rate column"></select></label>
+          <select id="mu-result" class="colsel" data-first-value="__auto__" data-first-label="➕ New column (automatic)" aria-label="Result column"></select>
+          <input type="text" id="mu-header" value="Amount" aria-label="New column name">
+          <button class="btn btn-primary" id="btn-multiply">Multiply</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Totals &amp; stats</h3>
+        <p class="hint">Writes SUM / AVERAGE / MAX / MIN / COUNT of a column below the data as a live formula.</p>
+        <div class="row wrap">
+          <select id="st2-col" class="colsel" aria-label="Column for statistic"></select>
+          <select id="st2-stat" aria-label="Statistic">
+            <option value="sum">SUM</option>
+            <option value="average">AVERAGE</option>
+            <option value="max">MAX</option>
+            <option value="min">MIN</option>
+            <option value="count">COUNT</option>
+          </select>
+          <button class="btn btn-primary" id="btn-stat">Add</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Freeze formulas as values</h3>
+        <p class="hint">Replaces formulas with their plain numbers (like Paste Special → Values) so they never change.</p>
+        <div class="row">
+          <select id="fz-col" class="colsel" data-first-value="__all__" data-first-label="🗂 Whole sheet" aria-label="Where to freeze"></select>
+          <button class="btn" id="btn-freeze">Freeze as values</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Fill serial numbers</h3>
+        <p class="hint">Fills 1, 2, 3… down a column for every row that has data (S.No / invoice numbers).</p>
+        <div class="row">
+          <select id="fs-col" class="colsel" aria-label="Column to number"></select>
+          <button class="btn" id="btn-series">Fill 1, 2, 3…</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Decimal places</h3>
+        <p class="hint">Adds or removes one decimal place in how numbers are displayed (123.4 → 123.40).</p>
+        <div class="row">
+          <select id="dc-col" class="colsel" aria-label="Column for decimals"></select>
+          <button class="btn" id="btn-dec-up">+ Increase</button>
+          <button class="btn" id="btn-dec-down">− Decrease</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3 · ACCOUNTS ==================== -->
+    <section class="tabpage" id="tab-accounts" role="tabpanel" hidden>
+      <div class="card intro">
+        <h3>🎓 Practice makes perfect!</h3>
+        <p class="hint">Load the <b>🧾 Practice Invoice</b> or <b>📒 Practice Ledger</b> from the top bar, then use the tools below. They work on your own files too.</p>
+      </div>
+      <div class="card">
+        <h3>Add Balance column</h3>
+        <p class="hint">Balance = amount − paid, written as real Excel formulas. Tick the box for a running balance that adds to the row above.</p>
+        <div class="row wrap">
+          <label class="inline">Amount <select id="ba-amount" class="colsel" aria-label="Amount column"></select></label>
+          <label class="inline">Paid <select id="ba-paid" class="colsel" aria-label="Paid column"></select></label>
+        </div>
+        <div class="row">
+          <label class="inline"><input type="checkbox" id="ba-running" checked> Running balance (add to previous row)</label>
+          <button class="btn btn-primary" id="btn-balance">Add Balance</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4 · SORT & FILTER ==================== -->
+    <section class="tabpage" id="tab-sort" role="tabpanel" hidden>
+      <div class="card">
+        <h3>Sort the table</h3>
+        <p class="hint">Sorts rows by a column, A→Z or Z→A. Formulas inside rows are turned into plain numbers while sorting so nothing breaks.</p>
+        <div class="row">
+          <select id="so-col" class="colsel" aria-label="Column to sort by"></select>
+          <button class="btn" id="btn-sort-asc">A → Z</button>
+          <button class="btn" id="btn-sort-desc">Z → A</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Add filter dropdowns</h3>
+        <p class="hint">When you open the saved file in Excel, each header gets a little arrow to filter rows.</p>
+        <div class="row">
+          <button class="btn btn-primary" id="btn-filter">Add filter dropdowns</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Quick find (preview only)</h3>
+        <p class="hint">Highlights matching rows in the preview below. Nothing in the file changes.</p>
+        <div class="row">
+          <input type="text" id="qf-input" placeholder="Type to highlight rows…" aria-label="Find text">
+          <button class="btn" id="btn-qf-clear">Clear</button>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <section class="main-area">
+    <div class="sheet-strip" id="sheet-strip" hidden></div>
+    <div class="preview-wrap" id="preview-wrap" hidden>
+      <div class="sel-status" id="sel-status"></div>
+      <div class="smart-suggestions" id="smart-suggestions" hidden></div>
+      <div class="context-menu" id="context-menu" hidden></div>
+      <div class="table-scroll">
+        <table id="preview"></table>
+      </div>
+      <p class="edit-hint">✏️ <b>Double-click any cell to edit it</b> — type text, numbers, or formulas like <b>=B2*C2</b>, then press Enter. Hover a green formula cell to see its formula.</p>
+      <p class="trunc-note hidden" id="trunc-note"></p>
+    </div>
+
+    <div class="empty-state" id="empty-state">
+      <div class="hero">
+        <div class="hero-illustration">📊</div>
+        <h1>Welcome to Excel Helper!</h1>
+        <p class="subtitle">Friendly tools for everyday Excel tasks — made for people who have never used formulas before.</p>
+        <div class="hero-steps">
+          <div class="step"><div class="step-num">1</div><div class="step-text"><b>Open your file</b> — or load the Practice Invoice / Ledger from the top bar.</div></div>
+          <div class="step"><div class="step-num">2</div><div class="step-text"><b>Pick a module on the left</b> — headers, formulas, accounts or sorting. Smart suggestions guide you.</div></div>
+          <div class="step"><div class="step-num">3</div><div class="step-text"><b>Download the result</b> — your finished .xlsx, ready for Excel.</div></div>
+        </div>
+        <p class="reassure">😉 Made a mistake? <b>Undo</b> is always one click away — the last 5 steps can be reversed.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="static/app.js" defer></script>
+</body>
+</html>

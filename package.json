@@ -1,0 +1,39 @@
+{
+  "name": "excel-helper",
+  "version": "1.0.0",
+  "description": "Excel Helper - friendly desktop tools for everyday Excel tasks",
+  "main": "main.js",
+  "author": "Excel Helper",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  },
+  "build": {
+    "appId": "com.excelhelper.app",
+    "productName": "Excel Helper",
+    "files": [
+      "main.js",
+      "preload.js",
+      "server.js",
+      "excel/**",
+      "index.html",
+      "static/**"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    }
+  },
+  "allowScripts": {
+    "electron@33.4.11": true
+  }
+}

@@ -1,0 +1,14 @@
+node_modules/
+.work/
+dist/
+*.log
+ipc-trace.txt
+debug.log
+__screenshot.png
+*.bat.bak
+.DS_Store
+_all.js
+_str.js
+launch-debug.js
+run-debug.bat
+.zcode
